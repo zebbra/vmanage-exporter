@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"time"
 )
 
 type Client struct {
@@ -39,6 +40,7 @@ func (c *Client) Login() error {
 		Transport: &http.Transport{
 			TLSClientConfig: c.TLSClientConfig,
 		},
+		Timeout: 10 * time.Second,
 	}
 
 	loginResp, err := client.PostForm(
@@ -93,6 +95,8 @@ func (c *Client) Request() (*resty.Request, error) {
 	rc.SetCookie(c.Session)
 	rc.SetHeader("X-XSRF-TOKEN", c.Token)
 	rc.SetTLSClientConfig(c.TLSClientConfig)
+	rc.SetTimeout(10 * time.Second)
+	rc.SetBaseURL(c.BaseURL)
 
 	return rc.R(), nil
 }
@@ -105,8 +109,6 @@ func (c *Client) Fetch(ctx context.Context, endpoint string, options FetchOption
 	}
 
 	r.SetContext(ctx)
-
-	endpoint = c.BaseURL + endpoint
 
 	if options != nil {
 		endpoint += "?" + options.Params().Encode()
