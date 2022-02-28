@@ -26,7 +26,7 @@ dockers:
       - "--platform=linux/amd64"
       - "--pull"
     image_templates:
-      - "ghcr.io/emgag/varnish-towncrier:{{ .Tag }}-amd64"
+      - "ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}-amd64"
     goos: linux
     goarch: amd64
     ids:
@@ -37,18 +37,18 @@ dockers:
       - "--platform=linux/arm64"
       - "--pull"
     image_templates:
-      - "ghcr.io/emgag/varnish-towncrier:{{ .Tag }}-arm64"
+      - "ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}-arm64"
     goos: linux
     goarch: arm64
     ids:
       - varnish-towncrier
 docker_manifests:
-  - name_template: ghcr.io/emgag/varnish-towncrier:{{ .Tag }}
+  - name_template: ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}
     image_templates:
-      - "ghcr.io/emgag/varnish-towncrier:{{ .Tag }}-amd64"
-      - "ghcr.io/emgag/varnish-towncrier:{{ .Tag }}-arm64"
-  - name_template: ghcr.io/emgag/varnish-towncrier:latest
+      - "ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}-amd64"
+      - "ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}-arm64"
+  - name_template: ghcr.io/zebbra/vmanage-exporter:latest
     image_templates:
-      - "ghcr.io/emgag/varnish-towncrier:{{ .Tag }}-amd64"
-      - "ghcr.io/emgag/varnish-towncrier:{{ .Tag }}-arm64"
+      - "ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}-amd64"
+      - "ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}-arm64"
 
