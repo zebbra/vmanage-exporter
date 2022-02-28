@@ -185,7 +185,7 @@ func Execute() {
 	rootCmd.Flags().Bool("tls.verify", true, "Verify certificate.")
 
 	rootCmd.Flags().Duration("scrape.interval", 15*time.Second, "Polling interval")
-	rootCmd.Flags().Int("scrape.max-errors", 100, "Max scrape errors before reporting exporter as unhealthy")
+	rootCmd.Flags().Int("scrape.max-errors", 25, "Max scrape errors before reporting exporter as unhealthy")
 
 	if err := rootCmd.Execute(); err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
