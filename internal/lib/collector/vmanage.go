@@ -188,44 +188,56 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, d := range devices {
-		deviceLabelsFull := DeviceLabelsFull(d)
-		deviceLabelsMinimal := DeviceLabelsMinimal(d)
+		deviceLabels := deviceLabels(d)
+
+		// device info
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc(
+				"vmanage_device_info",
+				"Info about device",
+				deviceLabelsInfo(d).Labels,
+				nil,
+			),
+			prometheus.GaugeValue,
+			status(d.Status),
+			deviceLabelsInfo(d).Values...,
+		)
 
 		// device stats
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc(
 				"vmanage_device_status",
 				"Status of device",
-				append(deviceLabelsFull.Labels, "status"),
+				append(deviceLabels.Labels, "status"),
 				nil,
 			),
 			prometheus.GaugeValue,
 			status(d.Status),
-			append(deviceLabelsFull.Values, d.Status)...,
+			append(deviceLabels.Values, d.Status)...,
 		)
 
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc(
 				"vmanage_device_reachability",
 				"Reachability of device",
-				append(deviceLabelsMinimal.Labels, "reachability"),
+				append(deviceLabels.Labels, "reachability"),
 				nil,
 			),
 			prometheus.GaugeValue,
 			reachable(d.IsReachable()),
-			append(deviceLabelsMinimal.Values, d.Reachability)...,
+			append(deviceLabels.Values, d.Reachability)...,
 		)
 
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc(
 				"vmanage_device_uptime",
 				"Uptime of device",
-				deviceLabelsMinimal.Labels,
+				deviceLabels.Labels,
 				nil,
 			),
 			prometheus.CounterValue,
 			uptime(d.UptimeDate),
-			deviceLabelsMinimal.Values...,
+			deviceLabels.Values...,
 		)
 
 		// system stats
@@ -238,115 +250,115 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 				prometheus.NewDesc(
 					"vmanage_device_mem_used",
 					"Memory Used",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				float64(mem.Used),
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_mem_free",
 					"Memory Free",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				float64(mem.Free),
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_mem_total",
 					"Memory Total",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				float64(mem.Total),
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_cpu_user_percentage",
 					"CPU User(%)",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				cpu.UserPercentage,
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_cpu_system_percentage",
 					"CPU System(%)",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				cpu.SystemPercentage,
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_cpu_idle_percentage",
 					"CPU Idle(%)",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				cpu.IdlePercentage,
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_load_avg1",
 					"Load Average 1 min",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				cpu.LoadAvg1,
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_load_avg5",
 					"Load Average 5 min",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				cpu.LoadAvg5,
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc(
 					"vmanage_device_load_avg15",
 					"Load Average 15 min",
-					deviceLabelsMinimal.Labels,
+					deviceLabels.Labels,
 					nil,
 				),
 				prometheus.GaugeValue,
 				cpu.LoadAvg15,
-				deviceLabelsMinimal.Values...,
+				deviceLabels.Values...,
 			)
 		}
 
 		// interface stats
 		if ifs, found := c.Cache.Get(fmt.Sprintf("ifs_%s", d.DeviceID)); found {
 			for _, i := range ifs.([]vmanage.DeviceInterface) {
-				ifLabels := InterfaceLabels(d, i)
+				ifLabels := interfaceLabels(d, i)
 
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(
@@ -449,7 +461,7 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 
 }
 
-func DeviceLabelsFull(d vmanage.Device) struct {
+func deviceLabelsInfo(d vmanage.Device) struct {
 	Labels []string
 	Values []string
 } {
@@ -472,7 +484,7 @@ func DeviceLabelsFull(d vmanage.Device) struct {
 	}
 }
 
-func DeviceLabelsMinimal(d vmanage.Device) struct {
+func deviceLabels(d vmanage.Device) struct {
 	Labels []string
 	Values []string
 } {
@@ -491,7 +503,7 @@ func DeviceLabelsMinimal(d vmanage.Device) struct {
 	}
 }
 
-func InterfaceLabels(d vmanage.Device, i vmanage.DeviceInterface) struct {
+func interfaceLabels(d vmanage.Device, i vmanage.DeviceInterface) struct {
 	Labels []string
 	Values []string
 } {
