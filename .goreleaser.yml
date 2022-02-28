@@ -30,7 +30,7 @@ dockers:
     goos: linux
     goarch: amd64
     ids:
-      - varnish-towncrier
+      - vmanage-exporter
   - dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
@@ -41,7 +41,7 @@ dockers:
     goos: linux
     goarch: arm64
     ids:
-      - varnish-towncrier
+      - vmanage-exporter
 docker_manifests:
   - name_template: ghcr.io/zebbra/vmanage-exporter:{{ .Tag }}
     image_templates:
