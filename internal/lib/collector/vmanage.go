@@ -351,7 +351,7 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(
 						"vmanage_device_interface_tx_octets",
-						"Interface TX octets",
+						"Interface TX Octets",
 						ifLabels.Labels,
 						nil,
 					),
@@ -363,7 +363,7 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(
 						"vmanage_device_interface_rx_octets",
-						"Interface RX octets",
+						"Interface RX Octets",
 						ifLabels.Labels,
 						nil,
 					),
@@ -375,7 +375,7 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(
 						"vmanage_device_interface_tx_packets",
-						"Interface TX packets",
+						"Interface TX Unicast Packets",
 						ifLabels.Labels,
 						nil,
 					),
@@ -387,12 +387,60 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(
 						"vmanage_device_interface_rx_packets",
-						"Interface RX packets",
+						"Interface RX Unicast Packets",
 						ifLabels.Labels,
 						nil,
 					),
 					prometheus.CounterValue,
 					float64(i.RxPackets),
+					ifLabels.Values...,
+				)
+
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc(
+						"vmanage_device_interface_tx_errors",
+						"Interface Tx Errors",
+						ifLabels.Labels,
+						nil,
+					),
+					prometheus.CounterValue,
+					float64(i.TxErrors),
+					ifLabels.Values...,
+				)
+
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc(
+						"vmanage_device_interface_rx_errors",
+						"Interface Rx Errors",
+						ifLabels.Labels,
+						nil,
+					),
+					prometheus.CounterValue,
+					float64(i.RxErrors),
+					ifLabels.Values...,
+				)
+
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc(
+						"vmanage_device_interface_tx_drops",
+						"Interface Tx Drops",
+						ifLabels.Labels,
+						nil,
+					),
+					prometheus.CounterValue,
+					float64(i.TxDrops),
+					ifLabels.Values...,
+				)
+
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc(
+						"vmanage_device_interface_rx_drops",
+						"Interface Rx Drops",
+						ifLabels.Labels,
+						nil,
+					),
+					prometheus.CounterValue,
+					float64(i.RxDrops),
 					ifLabels.Values...,
 				)
 			}
