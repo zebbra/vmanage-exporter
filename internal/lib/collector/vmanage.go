@@ -153,6 +153,8 @@ func (c *VmanageCollector) Collect(ch chan<- prometheus.Metric) {
 
 	if d, found := c.Cache.Get("devices"); found {
 		devices = d.(map[string]vmanage.Device)
+	} else {
+		return
 	}
 
 	// general stats
