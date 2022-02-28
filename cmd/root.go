@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"github.com/zebbra/vmanage-exporter/internal/lib/collector"
@@ -101,6 +102,9 @@ var rootCmd = &cobra.Command{
 		//return nil
 
 		reg := prometheus.NewPedanticRegistry()
+		_ = reg.Register(collectors.NewBuildInfoCollector())
+		_ = reg.Register(collectors.NewGoCollector())
+		_ = reg.Register(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 
 		mainCache := cache.New(5*scrapeInterval, 10*scrapeInterval)
 
